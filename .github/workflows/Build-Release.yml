@@ -64,14 +64,13 @@ jobs:
 
     - name: Build
       if: steps.ver.outputs.should_release == 'true'
-      run: dotnet publish "Vitalys XAU.sln" -c Release -r win-x64 --self-contained false /p:PublishSingleFile=true /p:PublishReadyToRun=false /p:IncludeAllContentForSelfExtract=true /p:EnableWindowsTargeting=true -o ./publish
+      run: dotnet publish "Vitalys XAU.sln" -c Release -r win-x64 --self-contained false /p:EnableWindowsTargeting=true -o ./publish
 
-    - name: Stage executable
+    - name: Package Windows app ZIP
       if: steps.ver.outputs.should_release == 'true'
       shell: pwsh
       run: |
-        Remove-Item -Path "${{ github.workspace }}/Vitalys XAU.exe" -ErrorAction Ignore
-        Copy-Item -Path "./publish/Vitalys XAU.exe" -Destination "${{ github.workspace }}/Vitalys XAU.exe"
+        Compress-Archive -Path "./publish/*" -DestinationPath "${{ github.workspace }}/Vitalys-XAU-win-x64.zip" -CompressionLevel Optimal
 
     - name: Create standard release
       if: steps.ver.outputs.should_release == 'true'
@@ -102,7 +101,7 @@ jobs:
         Set-Content -Path "release-notes.txt" -Value $body -Encoding utf8
 
         Write-Host "Release notes:`n$body"
-        gh release create "$version" "${{ github.workspace }}/Vitalys XAU.exe" `
+        gh release create "$version" "${{ github.workspace }}/Vitalys-XAU-win-x64.zip" `
           --repo "$env:GITHUB_REPOSITORY" `
           --title "$version" `
           --notes-file "release-notes.txt" `

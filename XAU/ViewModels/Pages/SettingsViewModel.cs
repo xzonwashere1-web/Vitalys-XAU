@@ -203,7 +203,9 @@ namespace XAU.ViewModels.Pages
             OAuthLogin = HomeViewModel.Settings.OAuthLogin;
             AutoGrabEventsToken = HomeViewModel.Settings.AutoGrabEventsToken;
             DiscordPresenceEnabled = HomeViewModel.Settings.DiscordPresenceEnabled;
-            DiscordApplicationId = HomeViewModel.Settings.DiscordApplicationId ?? string.Empty;
+            DiscordApplicationId = string.IsNullOrWhiteSpace(HomeViewModel.Settings.DiscordApplicationId)
+                ? XAUSettings.DefaultDiscordApplicationId
+                : HomeViewModel.Settings.DiscordApplicationId.Trim();
             _discordPresence.SetApplicationId(DiscordApplicationId);
         }
 

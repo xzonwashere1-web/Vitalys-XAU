@@ -14,7 +14,8 @@
     d:DesignWidth="800"
     ui:Design.Background="{DynamicResource ApplicationBackgroundBrush}"
     ui:Design.Foreground="{DynamicResource TextFillColorPrimaryBrush}"
-    Foreground="{DynamicResource TextFillColorPrimaryBrush}"
+    Background="White"
+    Foreground="Black"
     mc:Ignorable="d">
     <Grid Height="{Binding ElementName=SettingsPageRoot, Path=ActualHeight}"
           Width="{Binding ElementName=SettingsPageRoot, Path=ActualWidth}">
@@ -24,25 +25,25 @@
             Margin="4"
             HorizontalAlignment="Left"
             FontTypography="Title"
-            Text="Settings" />
-        <ui:CardControl Margin="4,2">
+            Text="Settings"  Foreground="Black" />
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Rich Presence" />
-                    <ui:TextBlock Grid.Row="1" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                  Text="Show the selected game, gamerscore earned, and time since opening its achievements in your Discord status. Discord desktop must be running." TextWrapping="Wrap" />
+                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Rich Presence"  Foreground="Black" />
+                    <ui:TextBlock Grid.Row="1"
+                                  Text="Show the selected game, gamerscore earned, and time since opening its achievements in your Discord status. Discord desktop must be running." TextWrapping="Wrap"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.DiscordPresenceEnabled, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Application ID" />
-                    <ui:TextBlock Grid.Row="1" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
-                                  Text="Required for Discord status. Create or select an app at discord.com/developers/applications, then copy its Application ID from General Information." TextWrapping="Wrap" />
+                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Application ID"  Foreground="Black" />
+                    <ui:TextBlock Grid.Row="1"
+                                  Text="Uses the Vitalys XAU Discord app by default. You can enter a custom Discord Application ID here." TextWrapping="Wrap"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <StackPanel Orientation="Horizontal">
@@ -50,7 +51,7 @@
                 <ui:Button Margin="8,0,0,0" Content="Save" Command="{Binding ViewModel.SaveSettingsCommand}" />
             </StackPanel>
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -61,17 +62,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Enable Unlock All"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Enables the functionality of the Unlock All button in the Achievements page."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.UnlockAllEnabled, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -82,17 +82,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Enable Auto Spoofer"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Automatically spoofs the title ID when you open a game's achievements page."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.AutoSpooferEnabled, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardExpander Margin="4,2">
+        <ui:CardExpander Margin="4,2" Background="White">
             <ui:CardExpander.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -103,12 +102,11 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Xbox App Launch Settings"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Configure how the Xbox app launches and behaves on startup."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardExpander.Header>
             <StackPanel>
@@ -153,7 +151,7 @@
                 </ui:Anchor>
             </StackPanel>
         </ui:CardExpander>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -164,17 +162,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="OAuth Login"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Use email and password instead of a memory scan for Xauth and Events tokens."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.OAuthLogin, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -185,17 +182,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Use Fake Signature"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Send a static string as the signature value or omit it when unlocking achievements."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.FakeSignatureEnabled, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -206,17 +202,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Privacy Mode"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Hide your profile info in the home page. Requires a refresh if info is already grabbed."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.PrivacyMode, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2">
+        <ui:CardControl Margin="4,2" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -227,17 +222,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Force English"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Uses the en-GB region when making web requests to the Xbox API's."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.RegionOverride, Mode=TwoWay}" />
         </ui:CardControl>
-        <ui:CardControl Margin="4,2" SizeChanged="XAuthBox_OnSizeChanged">
+        <ui:CardControl Margin="4,2" SizeChanged="XAuthBox_OnSizeChanged" Background="White">
             <ui:CardControl.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -248,17 +242,16 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="XAuth Token"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Token authorizing app access without username/password, expires in 24 hours."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardControl.Header>
             <ui:TextBox x:Name="XauthTextBox" TextChanged="XauthTextBox_OnTextChanged" />
         </ui:CardControl>
-        <ui:CardExpander Margin="4,2" SizeChanged="EventsBoxGrid_OnSizeChanged">
+        <ui:CardExpander Margin="4,2" SizeChanged="EventsBoxGrid_OnSizeChanged" Background="White">
             <ui:CardExpander.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -269,12 +262,11 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Events Token Settings"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Requires running XAU as an administrator. Flip a card in Solitaire to speed it up."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardExpander.Header>
             <StackPanel>
@@ -298,7 +290,7 @@
                             Text="No Token"
                             VerticalAlignment="Center"
                             Margin="0,0,12,0"
-                            TextWrapping="WrapWithOverflow" />
+                            TextWrapping="WrapWithOverflow"  Foreground="Black" />
                         <ui:TextBox Grid.Column="2" x:Name="EventsTokenBox" MaxLines="1" VerticalAlignment="Center" TextChanged="EventsToken_OnTextChanged" />
                     </Grid>
                 </ui:Anchor>
@@ -341,15 +333,15 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <TextBlock Grid.Column="0" Text="Created: " VerticalAlignment="Center" />
-                        <ui:TextBlock Grid.Column="1" x:Name="EventsTokenCreated" Text="N/A" VerticalAlignment="Center" Margin="0,0,24,0" />
+                        <ui:TextBlock Grid.Column="1" x:Name="EventsTokenCreated" Text="N/A" VerticalAlignment="Center" Margin="0,0,24,0"  Foreground="Black" />
                         <TextBlock Grid.Column="2" />
                         <TextBlock Grid.Column="3" Text="Expires: " VerticalAlignment="Center" />
-                        <ui:TextBlock Grid.Column="4" x:Name="EventsTokenExpires" Text="N/A" VerticalAlignment="Center" />
+                        <ui:TextBlock Grid.Column="4" x:Name="EventsTokenExpires" Text="N/A" VerticalAlignment="Center"  Foreground="Black" />
                     </Grid>
                 </ui:Anchor>
             </StackPanel>
         </ui:CardExpander>
-        <ui:CardExpander Margin="4,2">
+        <ui:CardExpander Margin="4,2" Background="White">
             <ui:CardExpander.Header>
                 <Grid>
                     <Grid.RowDefinitions>
@@ -360,12 +352,11 @@
                         Grid.Row="0"
                         FontTypography="Body"
                         Text="Developer API"
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                     <ui:TextBlock
                         Grid.Row="1"
-                        Foreground="{DynamicResource TextFillColorSecondaryBrush}"
                         Text="Advanced users can access the API to interact with XAU programmatically."
-                        TextWrapping="WrapWithOverflow" />
+                        TextWrapping="WrapWithOverflow"  Foreground="Black" />
                 </Grid>
             </ui:CardExpander.Header>
             <StackPanel>

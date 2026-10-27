@@ -32,7 +32,7 @@ namespace XAU.ViewModels.Pages
 
     public partial class HomeViewModel : ObservableObject, INavigationAware
     {
-        public static string ToolVersion = "26.10.29.1";
+        public static string ToolVersion = "26.10.29.2";
         public static string EventsVersion = "1.0";
 
         //attach vars
@@ -1189,7 +1189,9 @@ namespace XAU.ViewModels.Pages
             Settings.OAuthLogin = settings.OAuthLogin;
             Settings.AutoGrabEventsToken = settings.AutoGrabEventsToken;
             Settings.DiscordPresenceEnabled = settings.DiscordPresenceEnabled;
-            Settings.DiscordApplicationId = settings.DiscordApplicationId;
+            Settings.DiscordApplicationId = string.IsNullOrWhiteSpace(settings.DiscordApplicationId)
+                ? XAUSettings.DefaultDiscordApplicationId
+                : settings.DiscordApplicationId.Trim();
             Settings.CachedEventsToken = settings.CachedEventsToken;
             Settings.EventsTokenObtainedAt = settings.EventsTokenObtainedAt;
             Settings.EventsUserHash = settings.EventsUserHash;

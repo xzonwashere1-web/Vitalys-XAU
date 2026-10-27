@@ -10,6 +10,7 @@ namespace XAU.Services;
 /// <summary>Discord Rich Presence client using the local Discord IPC protocol.</summary>
 public sealed class DiscordPresenceService : IAsyncDisposable
 {
+    private const string DefaultApplicationId = XAUSettings.DefaultDiscordApplicationId;
     private readonly object _sync = new();
     private readonly SemaphoreSlim _sendLock = new(1, 1);
     private NamedPipeClientStream? _pipe;
@@ -45,7 +46,9 @@ public sealed class DiscordPresenceService : IAsyncDisposable
     public void SetApplicationId(string? applicationId)
     {
         lock (_sync)
-            _applicationId = applicationId?.Trim();
+            _applicationId = string.IsNullOrWhiteSpace(applicationId)
+                ? DefaultApplicationId
+                : applicationId.Trim();
     }
 
     public void Clear()
@@ -113,22 +116,29 @@ public sealed class DiscordPresenceService : IAsyncDisposable
                         {
                             details = "Using Vitalys XAU",
                             state = "Achievement progress",
-                            timestamps = new { start = update.StartedAt }
+                            timestamps = new { start = update.StartedAt },
+                            assets = new { large_image = "vitalysxau", large_text = "Vitalys XAU" }
                         }
                         : new
                         {
                             details = $"Unlocking achievements: {update.GameName}",
                             state = $"Gamerscore: {update.Gamerscore}/{update.TotalGamerscore}",
-                            timestamps = new { start = update.StartedAt }
+                            timestamps = new { start = update.StartedAt },
+                            assets = new { large_image = "vitalysxau", large_text = "Vitalys XAU" }
                         };
+                var nonce = Guid.NewGuid().ToString("N");
                 await SendFrameAsync(1, new
                 {
                     cmd = "SET_ACTIVITY",
                     args = new { pid = Environment.ProcessId, activity },
-                    nonce = Guid.NewGuid().ToString("N")
+                    nonce
                 }).ConfigureAwait(false);
-                // Discord replies to every frame; consume it so the pipe doesn't back up.
-                await ReadFrameAsync().ConfigureAwait(false);
+                var response = await ReadFrameAsync().ConfigureAwait(false);
+                if (response.Opcode != 1
+                    || (string?)response.Body["cmd"] != "SET_ACTIVITY"
+                    || (string?)response.Body["nonce"] != nonce
+                    || (string?)response.Body["evt"] == "ERROR")
+                    throw new IOException($"Discord rejected the Rich Presence update: {response.Body}");
             }
             catch (Exception ex)
             {

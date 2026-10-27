@@ -67,12 +67,16 @@ namespace XAU.ViewModels.Pages
                 OAuthLogin = OAuthLogin,
                 AutoGrabEventsToken = AutoGrabEventsToken,
                 DiscordPresenceEnabled = DiscordPresenceEnabled,
-                DiscordApplicationId = DiscordApplicationId
+                DiscordApplicationId = DiscordApplicationId?.Trim(),
+                // runtime-managed fields: keep them, otherwise saving any setting wipes the cached events token
+                CachedEventsToken = HomeViewModel.Settings.CachedEventsToken,
+                EventsTokenObtainedAt = HomeViewModel.Settings.EventsTokenObtainedAt,
+                EventsUserHash = HomeViewModel.Settings.EventsUserHash
             };
             string settingsJson = JsonConvert.SerializeObject(settings);
             File.WriteAllText(SettingsFilePath, settingsJson);
             HomeViewModel.Settings = settings; // update ref
-            _discordPresence.SetApplicationId(DiscordApplicationId);
+            _discordPresence.SetApplicationId(settings.DiscordApplicationId);
             if (!DiscordPresenceEnabled || PrivacyMode || string.IsNullOrWhiteSpace(DiscordApplicationId))
                 _discordPresence.Clear();
             else if (!string.IsNullOrWhiteSpace(AchievementsViewModel.ActiveGameName))

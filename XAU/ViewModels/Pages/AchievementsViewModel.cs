@@ -85,14 +85,22 @@ namespace XAU.ViewModels.Pages
             if (HomeViewModel.Settings.AutoSpooferEnabled)
             {
 
-                if (!GameInfoResponse.Titles.Any() && !String.IsNullOrWhiteSpace(GameInfoResponse.Xuid))
+                // Only meaningful once a game has actually been loaded (title id selected and API responded).
+                if (TitleIDOverride == "0" || !IsInitialized)
                 {
-                    _snackbarService.Show("Error: Game Info Response Contained No Titles", $"There were no titles returned from the API", ControlAppearance.Danger,
-                        new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
+                    // No game selected yet - nothing to spoof, and nothing to complain about.
+                }
+                else if (GameInfoResponse?.Titles == null || !GameInfoResponse.Titles.Any())
+                {
+                    if (!String.IsNullOrWhiteSpace(GameInfoResponse?.Xuid))
+                    {
+                        _snackbarService.Show("No Game Info", "The API returned no title information for this game.", ControlAppearance.Caution,
+                            new SymbolIcon(SymbolRegular.Warning24), _snackbarDuration);
+                    }
                 }
                 else
                 {
-                    if (HomeViewModel.SpoofingStatus == 1 && !!string.IsNullOrWhiteSpace(GameInfo))
+                    if (HomeViewModel.SpoofingStatus == 1 && string.IsNullOrWhiteSpace(GameInfo))
                     {
                         if (HomeViewModel.SpoofedTitleID == TitleIDOverride)
                         {
@@ -277,27 +285,30 @@ namespace XAU.ViewModels.Pages
             if (!IsSelectedGame360)
             {
                 Unlockable = true;
-                AchievementResponse = await _xboxRestAPI.Value.GetAchievementsForTitleAsync(HomeViewModel.XUIDOnly, TitleIDOverride);
                 try
                 {
-                    if (AchievementResponse.achievements[0].progression.requirements.Any())
-                    {
-                        if (AchievementResponse.achievements[0].progression.requirements[0].id !=
-                            StringConstants.ZeroUid)
-                        {
-                            Unlockable = false;
-                        }
-                        else
-                        {
-                            Unlockable = true;
-                        }
-                    }
+                    AchievementResponse = await _xboxRestAPI.Value.GetAchievementsForTitleAsync(HomeViewModel.XUIDOnly, TitleIDOverride);
                 }
-                catch
+                catch (Exception ex)
                 {
-                    _snackbarService.Show("Error: No Achievements", $"There were no achievements returned from the API", ControlAppearance.Danger,
+                    _snackbarService.Show("Error: Couldn't Load Achievements", ex.Message, ControlAppearance.Danger,
                         new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
                     return;
+                }
+
+                if (AchievementResponse?.achievements == null || AchievementResponse.achievements.Count == 0)
+                {
+                    // A genuinely empty list is not an error - some titles simply have no achievements.
+                    Unlockable = false;
+                    _snackbarService.Show("No Achievements", "This title has no achievements.", ControlAppearance.Caution,
+                        new SymbolIcon(SymbolRegular.Warning24), _snackbarDuration);
+                    return;
+                }
+
+                var firstRequirements = AchievementResponse.achievements[0].progression?.requirements;
+                if (firstRequirements != null && firstRequirements.Any())
+                {
+                    Unlockable = firstRequirements[0].id == StringConstants.ZeroUid;
                 }
                 for (int i = 0; i < AchievementResponse.achievements.Count; i++)
                 {

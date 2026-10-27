@@ -87,7 +87,12 @@ public sealed class DiscordPresenceService : IAsyncDisposable
                 if (_handshaken && _connectedApplicationId != applicationId)
                     Disconnect();
                 if (_pipe?.IsConnected != true && !await ConnectAsync().ConfigureAwait(false))
+                {
+                    // Discord not running yet: keep the update and retry shortly instead of dropping it.
+                    Requeue(update);
+                    if (!_disposed) await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
                     continue;
+                }
 
                 if (!_handshaken)
                 {
@@ -122,16 +127,30 @@ public sealed class DiscordPresenceService : IAsyncDisposable
                     args = new { pid = Environment.ProcessId, activity },
                     nonce = Guid.NewGuid().ToString("N")
                 }).ConfigureAwait(false);
+                // Discord replies to every frame; consume it so the pipe doesn't back up.
+                await ReadFrameAsync().ConfigureAwait(false);
             }
             catch (Exception ex)
             {
                 Debug.WriteLine($"Discord Rich Presence unavailable: {ex.Message}");
                 Disconnect();
+                Requeue(update);
+                if (!_disposed) await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
             }
             finally
             {
                 _sendLock.Release();
             }
+        }
+    }
+
+    private void Requeue(PresenceUpdate update)
+    {
+        lock (_sync)
+        {
+            // A newer update always wins; only restore the old one if nothing replaced it.
+            if (!_disposed && _pending == null && !update.Clear)
+                _pending = update;
         }
     }
 

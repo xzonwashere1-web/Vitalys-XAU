@@ -32,7 +32,7 @@ namespace XAU.ViewModels.Pages
 
     public partial class HomeViewModel : ObservableObject, INavigationAware
     {
-        public static string ToolVersion = "26.10.29";
+        public static string ToolVersion = "26.10.29.1";
         public static string EventsVersion = "1.0";
 
         //attach vars
@@ -1148,7 +1148,7 @@ namespace XAU.ViewModels.Pages
             {
                 IsLoggedIn = false;
                 XAUTHTested = true;
-                _snackbarService.Show("401 Unauthorized", "Something went wrong. Retrying.", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
+                _snackbarService.Show("Session Expired", "Please log in again.", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
             }
             catch (Exception ex)
             {

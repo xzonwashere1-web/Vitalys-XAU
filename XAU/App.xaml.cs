@@ -23,6 +23,7 @@ public partial class App
             services.AddSingleton<INavigationService, NavigationService>();
             services.AddSingleton<ISnackbarService, SnackbarService>();
             services.AddSingleton<IContentDialogService, ContentDialogService>();
+            services.AddSingleton<DiscordPresenceService>();
 
             services.AddSingleton<HomePage>();
             services.AddSingleton<HomeViewModel>();
@@ -56,6 +57,7 @@ public partial class App
 
     private async void OnExit(object sender, ExitEventArgs e)
     {
+        GetService<DiscordPresenceService>()?.Dispose();
         await Host.StopAsync();
         Host.Dispose();
     }

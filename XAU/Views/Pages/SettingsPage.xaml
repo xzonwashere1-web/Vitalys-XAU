@@ -28,6 +28,17 @@
         <ui:CardControl Margin="4,2">
             <ui:CardControl.Header>
                 <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Rich Presence" />
+                    <ui:TextBlock Grid.Row="1" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  Text="Show the selected game, gamerscore earned, and time since opening its achievements in your Discord status. Discord desktop must be running." TextWrapping="Wrap" />
+                </Grid>
+            </ui:CardControl.Header>
+            <ui:ToggleSwitch Command="{Binding ViewModel.SaveSettingsCommand}" IsChecked="{Binding ViewModel.DiscordPresenceEnabled, Mode=TwoWay}" />
+        </ui:CardControl>
+        <ui:CardControl Margin="4,2">
+            <ui:CardControl.Header>
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

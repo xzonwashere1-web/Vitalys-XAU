@@ -11,6 +11,7 @@ using Wpf.Ui.Common;
 using Wpf.Ui.Contracts;
 using Wpf.Ui.Services;
 using XAU.Views.Pages;
+using XAU.Services;
 
 namespace XAU.ViewModels.Pages
 {
@@ -33,6 +34,12 @@ namespace XAU.ViewModels.Pages
         private AchievementsResponse AchievementResponse = new AchievementsResponse();
         private Xbox360AchievementResponse Xbox360AchievementResponse = new Xbox360AchievementResponse();
         private Dictionary<int, DGAchievement> _unlockedAchievements = new Dictionary<int, DGAchievement>();
+        private readonly DiscordPresenceService _discordPresence;
+        private DateTime _gameSessionStarted = DateTime.Now;
+        public static string ActiveGameName { get; private set; } = string.Empty;
+        public static int ActiveGamerscore { get; private set; }
+        public static int ActiveTotalGamerscore { get; private set; }
+        public static DateTime ActiveGameSessionStarted { get; private set; } = DateTime.Now;
 
         private GameTitle GameInfoResponse = new GameTitle();
         // TODO: this needs to be updated if language changes
@@ -44,11 +51,12 @@ namespace XAU.ViewModels.Pages
         private dynamic EventsData = (dynamic)(new JObject());
         public static string EventsToken;
 
-        public AchievementsViewModel(ISnackbarService snackbarService, IContentDialogService contentDialogService, INavigationService navigationService)
+        public AchievementsViewModel(ISnackbarService snackbarService, IContentDialogService contentDialogService, INavigationService navigationService, DiscordPresenceService discordPresence)
         {
             _snackbarService = snackbarService;
             _contentDialogService = contentDialogService;
             _navigationService = navigationService;
+            _discordPresence = discordPresence;
         }
 
         private readonly IContentDialogService _contentDialogService;
@@ -109,6 +117,7 @@ namespace XAU.ViewModels.Pages
             {
                 TitleIDOverride = TitleID;
                 TitleID = "0";
+                _gameSessionStarted = DateTime.Now;
             }
             if (HomeViewModel.InitComplete && TitleIDOverride == "0")
                 TitleIDEnabled = true;
@@ -116,14 +125,20 @@ namespace XAU.ViewModels.Pages
                 InitializeViewModel();
         }
 
-        public void OnNavigatedFrom() { }
+        public void OnNavigatedFrom()
+        {
+            _discordPresence.Clear();
+            ActiveGameName = string.Empty;
+        }
 
         private async void InitializeViewModel()
         {
+            _gameSessionStarted = DateTime.Now;
             if (IsSelectedGame360)
                 Unlockable = false;
             await LoadGameInfo();
             await LoadAchievements();
+            UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
             if (HomeViewModel.Settings.AutoSpooferEnabled)
                 SpoofGame();
             TitleIDEnabled = true;
@@ -161,6 +176,21 @@ namespace XAU.ViewModels.Pages
                 GameName = gameTitle.Name;
                 IsTitleIDValid = true;
             }
+        }
+
+        private void UpdateDiscordPresence(int currentGamerscore, int totalGamerscore)
+        {
+            ActiveGameName = GameName;
+            ActiveGamerscore = currentGamerscore;
+            ActiveTotalGamerscore = totalGamerscore;
+            ActiveGameSessionStarted = _gameSessionStarted;
+            if (!HomeViewModel.Settings.DiscordPresenceEnabled || HomeViewModel.Settings.PrivacyMode)
+            {
+                _discordPresence.Clear();
+                return;
+            }
+
+            _discordPresence.SetGame(GameName, currentGamerscore, totalGamerscore, _gameSessionStarted);
         }
 
         private async void SpoofGame()
@@ -665,6 +695,7 @@ namespace XAU.ViewModels.Pages
 
             await LoadGameInfo();
             await LoadAchievements();
+            UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
             NewGame = false;
             if (HomeViewModel.Settings.AutoSpooferEnabled)
                 SpoofGame();
@@ -689,6 +720,7 @@ namespace XAU.ViewModels.Pages
                 }
 
                 CollectionViewSource.GetDefaultView(DGAchievements).Refresh();
+                UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
 
                 if (string.IsNullOrWhiteSpace(SearchText) && !IsFiltered)
                 {

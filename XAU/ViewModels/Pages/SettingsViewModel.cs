@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using Wpf.Ui.Controls;
 using XAU.Services.HttpServer;
+using XAU.Services;
 
 namespace XAU.ViewModels.Pages
 {
@@ -28,6 +29,7 @@ namespace XAU.ViewModels.Pages
         [ObservableProperty] private bool _privacyMode;
         [ObservableProperty] private bool _oAuthLogin;
         [ObservableProperty] private bool _autoGrabEventsToken;
+        [ObservableProperty] private bool _discordPresenceEnabled = true;
         [ObservableProperty] private string _xauth;
 
         [ObservableProperty] private bool _serverEnabled;
@@ -35,10 +37,16 @@ namespace XAU.ViewModels.Pages
         [ObservableProperty] private string _listeningAddress = "http://localhost:1337";
 
         private HttpServer? _httpServer;
+        private readonly DiscordPresenceService _discordPresence;
         private bool _disposed;
 
         public static bool ManualXauth = false;
         public RoutedEventHandler OnNavigatedToEvent = null!;
+
+        public SettingsViewModel(DiscordPresenceService discordPresence)
+        {
+            _discordPresence = discordPresence;
+        }
 
         [RelayCommand]
         public void SaveSettings()
@@ -56,12 +64,19 @@ namespace XAU.ViewModels.Pages
                 UseAcrylic = UseAcrylic,
                 PrivacyMode = PrivacyMode,
                 OAuthLogin = OAuthLogin,
-                AutoGrabEventsToken = AutoGrabEventsToken
+                AutoGrabEventsToken = AutoGrabEventsToken,
+                DiscordPresenceEnabled = DiscordPresenceEnabled
             };
             string settingsJson = JsonConvert.SerializeObject(settings);
             File.WriteAllText(SettingsFilePath, settingsJson);
             HomeViewModel.Settings = settings; // update ref
+            if (!DiscordPresenceEnabled || PrivacyMode)
+                _discordPresence.Clear();
+            else if (!string.IsNullOrWhiteSpace(AchievementsViewModel.ActiveGameName))
+                _discordPresence.SetGame(AchievementsViewModel.ActiveGameName, AchievementsViewModel.ActiveGamerscore,
+                    AchievementsViewModel.ActiveTotalGamerscore, AchievementsViewModel.ActiveGameSessionStarted);
         }
+
 
         [RelayCommand]
         private void ToggleServer()
@@ -178,6 +193,7 @@ namespace XAU.ViewModels.Pages
             Xauth = HomeViewModel.XAUTH;
             OAuthLogin = HomeViewModel.Settings.OAuthLogin;
             AutoGrabEventsToken = HomeViewModel.Settings.AutoGrabEventsToken;
+            DiscordPresenceEnabled = HomeViewModel.Settings.DiscordPresenceEnabled;
         }
 
         private string GetAssemblyVersion()

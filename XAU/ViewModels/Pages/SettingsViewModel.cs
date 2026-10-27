@@ -30,6 +30,7 @@ namespace XAU.ViewModels.Pages
         [ObservableProperty] private bool _oAuthLogin;
         [ObservableProperty] private bool _autoGrabEventsToken;
         [ObservableProperty] private bool _discordPresenceEnabled = true;
+        [ObservableProperty] private string _discordApplicationId = string.Empty;
         [ObservableProperty] private string _xauth;
 
         [ObservableProperty] private bool _serverEnabled;
@@ -65,12 +66,14 @@ namespace XAU.ViewModels.Pages
                 PrivacyMode = PrivacyMode,
                 OAuthLogin = OAuthLogin,
                 AutoGrabEventsToken = AutoGrabEventsToken,
-                DiscordPresenceEnabled = DiscordPresenceEnabled
+                DiscordPresenceEnabled = DiscordPresenceEnabled,
+                DiscordApplicationId = DiscordApplicationId
             };
             string settingsJson = JsonConvert.SerializeObject(settings);
             File.WriteAllText(SettingsFilePath, settingsJson);
             HomeViewModel.Settings = settings; // update ref
-            if (!DiscordPresenceEnabled || PrivacyMode)
+            _discordPresence.SetApplicationId(DiscordApplicationId);
+            if (!DiscordPresenceEnabled || PrivacyMode || string.IsNullOrWhiteSpace(DiscordApplicationId))
                 _discordPresence.Clear();
             else if (!string.IsNullOrWhiteSpace(AchievementsViewModel.ActiveGameName))
                 _discordPresence.SetGame(AchievementsViewModel.ActiveGameName, AchievementsViewModel.ActiveGamerscore,
@@ -194,6 +197,8 @@ namespace XAU.ViewModels.Pages
             OAuthLogin = HomeViewModel.Settings.OAuthLogin;
             AutoGrabEventsToken = HomeViewModel.Settings.AutoGrabEventsToken;
             DiscordPresenceEnabled = HomeViewModel.Settings.DiscordPresenceEnabled;
+            DiscordApplicationId = HomeViewModel.Settings.DiscordApplicationId ?? string.Empty;
+            _discordPresence.SetApplicationId(DiscordApplicationId);
         }
 
         private string GetAssemblyVersion()

@@ -39,6 +39,20 @@
         <ui:CardControl Margin="4,2">
             <ui:CardControl.Header>
                 <Grid>
+                    <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                    <ui:TextBlock Grid.Row="0" FontTypography="Body" Text="Discord Application ID" />
+                    <ui:TextBlock Grid.Row="1" Foreground="{DynamicResource TextFillColorSecondaryBrush}"
+                                  Text="Required for Discord status. Create or select an app at discord.com/developers/applications, then copy its Application ID from General Information." TextWrapping="Wrap" />
+                </Grid>
+            </ui:CardControl.Header>
+            <StackPanel Orientation="Horizontal">
+                <ui:TextBox Width="260" Text="{Binding ViewModel.DiscordApplicationId, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" PlaceholderText="Paste Application ID" />
+                <ui:Button Margin="8,0,0,0" Content="Save" Command="{Binding ViewModel.SaveSettingsCommand}" />
+            </StackPanel>
+        </ui:CardControl>
+        <ui:CardControl Margin="4,2">
+            <ui:CardControl.Header>
+                <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />

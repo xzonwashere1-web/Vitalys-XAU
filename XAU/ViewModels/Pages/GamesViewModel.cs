@@ -4,6 +4,7 @@ using Wpf.Ui.Common;
 using Wpf.Ui.Contracts;
 using Wpf.Ui.Controls;
 using XAU.Views.Pages;
+using XAU.Services;
 namespace XAU.ViewModels.Pages
 {
     public partial class GamesViewModel(ISnackbarService snackbarService, INavigationService navigationService) : ObservableObject, INavigationAware, INotifyPropertyChanged
@@ -16,7 +17,7 @@ namespace XAU.ViewModels.Pages
         [ObservableProperty] private GridLength _loadingHeight = new GridLength(1, GridUnitType.Star);
         [ObservableProperty] private double _loadingSize = 200;
         [ObservableProperty] private string _searchText = "";
-        [ObservableProperty] private List<string> _filterOptions = new List<string>() { "All", "Xbox One/Series", "PC", "Xbox 360", "Win32", "Incomplete Games" };
+        [ObservableProperty] private List<string> _filterOptions = new List<string>() { "All", "Xbox One/Series", "PC", "Xbox 360", "Win32", "Incomplete Games", "Unlocked with XAU" };
         [ObservableProperty] private int _filterIndex = 0;
         [ObservableProperty] private int _numPages = 0;
         [ObservableProperty] private ObservableCollection<string> _pageOptions = new ObservableCollection<string>();
@@ -49,6 +50,8 @@ namespace XAU.ViewModels.Pages
         {
             if (!IsInitialized && HomeViewModel.InitComplete)
                 await InitializeViewModel();
+            else if (IsInitialized && FilterIndex == 6)
+                FilterGames();
         }
 
         public void OnNavigatedFrom()
@@ -171,6 +174,15 @@ namespace XAU.ViewModels.Pages
 
                         }
                         break;
+                    case 6:
+                        var searchedXauTitleIds = XauUnlockHistory.GetTitleIds();
+                        for (int i = 0; i < GamesResponse.Titles.Count; i++)
+                        {
+                            var title = GamesResponse.Titles[i];
+                            if (searchedXauTitleIds.Contains(title.TitleId) && title.Name.Contains(SearchText, StringComparison.OrdinalIgnoreCase))
+                                AddGame(i);
+                        }
+                        break;
                 }
             }
             else
@@ -186,7 +198,7 @@ namespace XAU.ViewModels.Pages
             }
 
             LoadingEnd();
-            SearchLabel = $"Search {GamesResponse.Titles.Count.ToString()} Games";
+            SearchLabel = $"Search {Games.Count} of {GamesResponse.Titles.Count} Games";
             if (Games.Count() == 0)
             {
                 _snackbarService.Show("Error", $"No Games Found", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
@@ -271,6 +283,14 @@ namespace XAU.ViewModels.Pages
                             }
                         }
                         break;
+                    case 6:
+                        var xauTitleIds = XauUnlockHistory.GetTitleIds();
+                        for (int i = 0; i < GamesResponse.Titles.Count; i++)
+                        {
+                            if (xauTitleIds.Contains(GamesResponse.Titles[i].TitleId))
+                                AddGame(i);
+                        }
+                        break;
                 }
             }
             else
@@ -282,7 +302,7 @@ namespace XAU.ViewModels.Pages
             }
 
             LoadingEnd();
-            SearchLabel = $"Search {GamesResponse.Titles.Count.ToString()} Games";
+            SearchLabel = $"Search {Games.Count} of {GamesResponse.Titles.Count} Games";
             if (Games.Count() == 0)
             {
                 _snackbarService.Show("Error", $"No Games Found", ControlAppearance.Danger, new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);

@@ -14,9 +14,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <UseWindowsForms>true</UseWindowsForms>
-    <Version>26.10.27</Version>
-    <AssemblyVersion>26.10.27.0</AssemblyVersion>
-    <FileVersion>26.10.27.0</FileVersion>
+    <Version>26.10.28</Version>
+    <AssemblyVersion>26.10.28.0</AssemblyVersion>
+    <FileVersion>26.10.28.0</FileVersion>
     <Copyright>Vitaly fork; original Xbox Achievement Unlocker by Draff and contributors</Copyright>
     <Platforms>AnyCPU;x64</Platforms>
   </PropertyGroup>

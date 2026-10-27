@@ -13,6 +13,7 @@ public class XAUSettings
     public bool OAuthLogin { get; set; }
     public bool AutoGrabEventsToken { get; set; }
     public bool DiscordPresenceEnabled { get; set; } = true;
+    public string? DiscordApplicationId { get; set; }
     public string? CachedEventsToken { get; set; }
     public DateTime? EventsTokenObtainedAt { get; set; }
     public string? EventsUserHash { get; set; }

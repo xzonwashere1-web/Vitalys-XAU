@@ -80,6 +80,8 @@ namespace XAU.ViewModels.Pages
         }
         public async void OnNavigatedTo()
         {
+            if (NewGame)
+                _gameSessionStarted = DateTime.Now;
             if (HomeViewModel.Settings.AutoSpooferEnabled)
             {
 
@@ -184,7 +186,8 @@ namespace XAU.ViewModels.Pages
             ActiveGamerscore = currentGamerscore;
             ActiveTotalGamerscore = totalGamerscore;
             ActiveGameSessionStarted = _gameSessionStarted;
-            if (!HomeViewModel.Settings.DiscordPresenceEnabled || HomeViewModel.Settings.PrivacyMode)
+            _discordPresence.SetApplicationId(HomeViewModel.Settings.DiscordApplicationId);
+            if (!HomeViewModel.Settings.DiscordPresenceEnabled || HomeViewModel.Settings.PrivacyMode || string.IsNullOrWhiteSpace(HomeViewModel.Settings.DiscordApplicationId))
             {
                 _discordPresence.Clear();
                 return;
@@ -550,7 +553,9 @@ namespace XAU.ViewModels.Pages
                         _unlockedAchievements.Add(unlockedAchievement.ID, unlockedAchievement);
                     }
 
+                    RecordXauUnlock();
                     CollectionViewSource.GetDefaultView(DGAchievements).Refresh();
+                    UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
                 }
                 catch (HttpRequestException ex)
                 {
@@ -642,7 +647,9 @@ namespace XAU.ViewModels.Pages
                     DGAchievements[AchievementIndex].IsUnlockable = false;
                     DGAchievements[AchievementIndex].ProgressState = "Achieved";
                     DGAchievements[AchievementIndex].DateUnlocked = DateTime.Now;
+                    RecordXauUnlock();
                     CollectionViewSource.GetDefaultView(DGAchievements).Refresh();
+                    UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
                 }
                 catch
                 {
@@ -677,7 +684,9 @@ namespace XAU.ViewModels.Pages
                         achievement.DateUnlocked = unlocktime;
                     }
                 }
+                RecordXauUnlock();
                 CollectionViewSource.GetDefaultView(DGAchievements).Refresh();
+                UpdateDiscordPresence(DGAchievements.Where(a => a.ProgressState == StringConstants.Achieved).Sum(a => a.Gamerscore), DGAchievements.Sum(a => a.Gamerscore));
             }
             catch (HttpRequestException hre)
             {
@@ -685,6 +694,11 @@ namespace XAU.ViewModels.Pages
                                         $"{hre.Message}", ControlAppearance.Danger,
                                         new SymbolIcon(SymbolRegular.ErrorCircle24), _snackbarDuration);
             }
+        }
+
+        private void RecordXauUnlock()
+        {
+            XauUnlockHistory.Record(TitleIDOverride, GameName);
         }
 
         [RelayCommand]

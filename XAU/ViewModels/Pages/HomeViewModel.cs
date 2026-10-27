@@ -31,7 +31,7 @@ namespace XAU.ViewModels.Pages
 
     public partial class HomeViewModel : ObservableObject, INavigationAware
     {
-        public static string ToolVersion = "26.10.27";
+        public static string ToolVersion = "26.10.28";
         public static string EventsVersion = "1.0";
 
         //attach vars

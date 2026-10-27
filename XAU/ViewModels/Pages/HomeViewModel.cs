@@ -4,6 +4,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using XAU.Util.Etw;
+using XAU.Services;
 using System.Windows.Media;
 using Wpf.Ui.Controls;
 using Memory;
@@ -62,6 +63,7 @@ namespace XAU.ViewModels.Pages
         [ObservableProperty] private ObservableCollection<ImageItem> _watermarks = new ObservableCollection<ImageItem>();
 
         private readonly Lazy<XboxRestAPI> _xboxRestAPI;
+        private readonly DiscordPresenceService _discordPresence;
         private readonly Lazy<GithubRestApi> _gitHubRestAPI = new Lazy<GithubRestApi>();
 
         public static int SpoofingStatus = 0; //0 = NotSpoofing, 1 = Spoofing, 2 = AutoSpoofing
@@ -69,10 +71,11 @@ namespace XAU.ViewModels.Pages
         public static string AutoSpoofedTitleID = "0";
 
         //SnackBar
-        public HomeViewModel(ISnackbarService snackbarService, IContentDialogService contentDialogService)
+        public HomeViewModel(ISnackbarService snackbarService, IContentDialogService contentDialogService, DiscordPresenceService discordPresence)
         {
             _snackbarService = snackbarService;
             _contentDialogService = contentDialogService;
+            _discordPresence = discordPresence;
 
             // Assume XAUTH and System Language are set by the time this is actually instantiated
             _xboxRestAPI = new Lazy<XboxRestAPI>(() => new XboxRestAPI(XAUTH));
@@ -368,6 +371,9 @@ namespace XAU.ViewModels.Pages
             CheckForEventUpdates();
             CheckForXboxGamesDatabaseUpdate();
             LoadSettings();
+            _discordPresence.SetApplicationId(Settings.DiscordApplicationId);
+            if (Settings.DiscordPresenceEnabled && !Settings.PrivacyMode && !string.IsNullOrWhiteSpace(Settings.DiscordApplicationId))
+                _discordPresence.SetAppActive(DateTime.Now);
             if (Settings.OAuthLogin)
                 OAuthLogin();
             _isInitialized = true;
@@ -1182,6 +1188,8 @@ namespace XAU.ViewModels.Pages
             Settings.PrivacyMode = settings.PrivacyMode;
             Settings.OAuthLogin = settings.OAuthLogin;
             Settings.AutoGrabEventsToken = settings.AutoGrabEventsToken;
+            Settings.DiscordPresenceEnabled = settings.DiscordPresenceEnabled;
+            Settings.DiscordApplicationId = settings.DiscordApplicationId;
             Settings.CachedEventsToken = settings.CachedEventsToken;
             Settings.EventsTokenObtainedAt = settings.EventsTokenObtainedAt;
             Settings.EventsUserHash = settings.EventsUserHash;

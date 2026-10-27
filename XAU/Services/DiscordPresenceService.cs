@@ -8,7 +8,7 @@ using Newtonsoft.Json.Linq;
 namespace XAU.Services;
 
 /// <summary>Discord Rich Presence client using the local Discord IPC protocol.</summary>
-public sealed class DiscordPresenceService : IDisposable
+public sealed class DiscordPresenceService : IAsyncDisposable
 {
     private readonly object _sync = new();
     private readonly SemaphoreSlim _sendLock = new(1, 1);
@@ -26,7 +26,18 @@ public sealed class DiscordPresenceService : IDisposable
         {
             if (_disposed) return;
             _pending = new PresenceUpdate(gameName, gamerscore, totalGamerscore,
-                new DateTimeOffset(sessionStarted).ToUnixTimeSeconds());
+                new DateTimeOffset(sessionStarted).ToUnixTimeSeconds(), false, false);
+            _worker ??= Task.Run(ProcessUpdatesAsync);
+        }
+    }
+
+    public void SetAppActive(DateTime sessionStarted)
+    {
+        lock (_sync)
+        {
+            if (_disposed) return;
+            _pending = new PresenceUpdate(null, 0, 0,
+                new DateTimeOffset(sessionStarted).ToUnixTimeSeconds(), true, false);
             _worker ??= Task.Run(ProcessUpdatesAsync);
         }
     }
@@ -37,7 +48,15 @@ public sealed class DiscordPresenceService : IDisposable
             _applicationId = applicationId?.Trim();
     }
 
-    public void Clear() => SetGame(null, 0, 0, DateTime.Now);
+    public void Clear()
+    {
+        lock (_sync)
+        {
+            if (_disposed) return;
+            _pending = new PresenceUpdate(null, 0, 0, 0, false, true);
+            _worker ??= Task.Run(ProcessUpdatesAsync);
+        }
+    }
 
     private async Task ProcessUpdatesAsync()
     {
@@ -46,7 +65,7 @@ public sealed class DiscordPresenceService : IDisposable
             PresenceUpdate update;
             lock (_sync)
             {
-                if (_disposed || _pending == null)
+                if (_pending == null)
                 {
                     _worker = null;
                     return;
@@ -82,14 +101,21 @@ public sealed class DiscordPresenceService : IDisposable
                     _connectedApplicationId = applicationId;
                 }
 
-                object? activity = string.IsNullOrWhiteSpace(update.GameName)
+                object? activity = update.Clear
                     ? null
-                    : new
-                    {
-                        details = $"Unlocking achievements: {update.GameName}",
-                        state = $"Gamerscore: {update.Gamerscore}/{update.TotalGamerscore}",
-                        timestamps = new { start = update.StartedAt }
-                    };
+                    : update.AppActive
+                        ? new
+                        {
+                            details = "Using Vitalys XAU",
+                            state = "Achievement progress",
+                            timestamps = new { start = update.StartedAt }
+                        }
+                        : new
+                        {
+                            details = $"Unlocking achievements: {update.GameName}",
+                            state = $"Gamerscore: {update.Gamerscore}/{update.TotalGamerscore}",
+                            timestamps = new { start = update.StartedAt }
+                        };
                 await SendFrameAsync(1, new
                 {
                     cmd = "SET_ACTIVITY",
@@ -169,22 +195,29 @@ public sealed class DiscordPresenceService : IDisposable
         _connectedApplicationId = null;
     }
 
-    public void Dispose()
+    public async ValueTask DisposeAsync()
     {
+        Task worker;
         lock (_sync)
         {
             if (_disposed) return;
             _disposed = true;
-            _pending = new PresenceUpdate(null, 0, 0, 0);
+            _pending = new PresenceUpdate(null, 0, 0, 0, false, true);
             _worker ??= Task.Run(ProcessUpdatesAsync);
+            worker = _worker;
         }
-        _ = Task.Run(async () =>
+        await worker.ConfigureAwait(false);
+        await _sendLock.WaitAsync().ConfigureAwait(false);
+        try
         {
-            await _sendLock.WaitAsync().ConfigureAwait(false);
-            try { Disconnect(); }
-            finally { _sendLock.Release(); _sendLock.Dispose(); }
-        });
+            Disconnect();
+        }
+        finally
+        {
+            _sendLock.Release();
+            _sendLock.Dispose();
+        }
     }
 
-    private sealed record PresenceUpdate(string? GameName, int Gamerscore, int TotalGamerscore, long StartedAt);
+    private sealed record PresenceUpdate(string? GameName, int Gamerscore, int TotalGamerscore, long StartedAt, bool AppActive, bool Clear);
 }

@@ -129,8 +129,6 @@ namespace XAU.ViewModels.Pages
 
         public void OnNavigatedFrom()
         {
-            _discordPresence.Clear();
-            ActiveGameName = string.Empty;
         }
 
         private async void InitializeViewModel()

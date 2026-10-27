@@ -1,7 +1,6 @@
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Input;
-using System.Windows.Media.Imaging;
 using Wpf.Ui.Controls;
 using XAU.ViewModels.Pages;
 
@@ -59,7 +58,7 @@ namespace XAU.Views.Pages
         {
             if (sender is Wpf.Ui.Controls.Image uiImage)
             {
-                uiImage.Source = new BitmapImage(new Uri("pack://application:,,,/Assets/vitalys-xau.png"));
+                uiImage.Source = null;
             }
         }
     }

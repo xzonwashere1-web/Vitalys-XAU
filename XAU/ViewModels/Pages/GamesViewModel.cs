@@ -331,7 +331,6 @@ namespace XAU.ViewModels.Pages
         private void AddGame(int index)
         {
             var title = GamesResponse.Titles[index];
-            var EditedImage = "pack://application:,,,/Assets/vitalys-xau.png";
             Games.Add(new Game()
             {
                 Title = title.Name.ToString(),
@@ -339,7 +338,7 @@ namespace XAU.ViewModels.Pages
                 Gamerscore = title.Achievement.CurrentGamerscore.ToString() + "/" +
                              title.Achievement.TotalGamerscore.ToString(),
                 Progress = title.Achievement.ProgressPercentage.ToString(),
-                Image = EditedImage,
+                Image = title.DisplayImage ?? string.Empty,
                 Index = index.ToString()
             });
         }

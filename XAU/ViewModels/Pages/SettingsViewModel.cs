@@ -78,6 +78,8 @@ namespace XAU.ViewModels.Pages
             else if (!string.IsNullOrWhiteSpace(AchievementsViewModel.ActiveGameName))
                 _discordPresence.SetGame(AchievementsViewModel.ActiveGameName, AchievementsViewModel.ActiveGamerscore,
                     AchievementsViewModel.ActiveTotalGamerscore, AchievementsViewModel.ActiveGameSessionStarted);
+            else
+                _discordPresence.SetAppActive(DateTime.Now);
         }
 
 

@@ -57,7 +57,9 @@ public partial class App
 
     private async void OnExit(object sender, ExitEventArgs e)
     {
-        GetService<DiscordPresenceService>()?.Dispose();
+        var discordPresence = GetService<DiscordPresenceService>();
+        if (discordPresence != null)
+            await discordPresence.DisposeAsync();
         await Host.StopAsync();
         Host.Dispose();
     }
